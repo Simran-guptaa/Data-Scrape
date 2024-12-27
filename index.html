@@ -1,0 +1,128 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Search</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css">
+    <style>
+         body {
+        font-family: "Arial", sans-serif;
+        background-color: #f4f4f9;
+        margin: 0;
+        padding: 0;
+        color: #333;
+      }
+
+        #results .result-item {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            text-align: center;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        #results .result-item h5 {
+            margin: 0 0 10px;
+            color: #4caf50;
+            font-weight: bold;
+        }
+        .result-item {
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+}
+#results .result-item {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    text-align: center;
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+        #results .result-item a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        #results .result-item a:hover {
+            text-decoration: underline;
+        }
+        form {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        #websiteSelect {
+            background-color: #4caf50;
+            color: white;
+        }
+        .btn-primary{
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+            border-color:none;
+        }
+        div#results {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+            text-align: center;
+            justify-items: center;
+}
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Product Search</h1>
+        <form id="searchForm" method="post">
+            <input type="text" id="searchInput" name="search_term" class="form-control" placeholder="Enter product name" required>
+            <select id="websiteSelect" class="form-select">
+                <option value="all">All</option>
+                <option value="amazon">Amazon</option>
+                <option value="flipkart">Flipkart</option>
+                <option value="myntra">myntra</option>
+                <option value="croma">Croma</option>
+            </select>
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+        <div id="results" class="mt-5"></div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#searchForm').on('submit', function (e) {
+                e.preventDefault();
+                const searchTerm = $('#searchInput').val();
+                const selectedWebsite = $('#websiteSelect').val();
+                $.post('/search', { search_term: searchTerm, website: selectedWebsite }, function (data) {
+                    console.log(data);
+                    let html = '';
+                    data.forEach(item => {
+                        if (item.Error) {
+                            html += `<div class="result-item">
+                                <h5>${item.Website}</h5>
+                                <p>${item.Error}</p>
+                            </div>`;
+                        } else {
+                            html += `<div class="result-item">
+                                <h5>${item.Title} - <small>${item.Website}</small></h5>
+                                <p><strong>Price:</strong> ${item.Price}</p>
+                                <p><strong>Offer Price:</strong> ${item['Offer Price']}</p>
+                                <p><strong>Rating:</strong> ${item.Rating}</p>
+                                <p><strong>Reviews:</strong> ${item.Reviews}</p>
+                                <a href="${item['Product Link']}" target="_blank">View Product</a>
+                            </div>`;
+                        }
+                    });
+                    $('#results').html(html);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
+    
